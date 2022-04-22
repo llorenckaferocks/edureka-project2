@@ -40,24 +40,18 @@ pipeline {
             }
         }
         stage('CanaryDeploy') {
-            try{
-                when {
-                    branch 'master'
-                }
-                environment {
-                    CANARY_REPLICAS = 1
-                }
-                steps {
-                        kubernetesDeploy(
-                            kubeconfigId: 'kubeconfig',
-                            configs: 'train-schedule-kube-canary.yml',
-                            enableConfigSubstitution: true
-                        )
-                }
-            }catch(Exception e) {
-                echo "Exception occurred on CanaryDeploy"
-                currentBuild.result="FAILURE"
-                throw e
+            when {
+                branch 'master'
+            }
+            environment {
+                CANARY_REPLICAS = 1
+            }
+            steps {
+                kubernetesDeploy(
+                    kubeconfigId: 'kubeconfig',
+                    configs: 'train-schedule-kube-canary.yml',
+                    enableConfigSubstitution: true
+                )
             }
         }
         stage('DeployToProduction') {
@@ -84,4 +78,3 @@ pipeline {
         }
     }
 }
-
